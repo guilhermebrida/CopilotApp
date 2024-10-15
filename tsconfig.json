@@ -1,0 +1,9 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "jsx": "react", // ou "react-native" para projetos React Native
+    "allowJs": true, // Permite que arquivos .js sejam incluídos
+    "module": "esnext", // ou "commonjs", dependendo do projeto
+    "target": "esnext", // Define a versão de ES que será usada
+  }
+}
