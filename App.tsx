@@ -10,6 +10,7 @@ import {
 import DeviceModal from "./DeviceConnectionModal";
 import { PulseIndicator } from "./PulseIndicator";
 import useBLE from "./useBLE";
+import LoginScreen from "./login";
 
 const App = () => {
   const {
@@ -20,10 +21,10 @@ const App = () => {
     connectedDevice,
     heartRate,
     disconnectFromDevice,
-    sendCommandToDevice
   } = useBLE();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
@@ -42,6 +43,14 @@ const App = () => {
     setIsModalVisible(true);
   };
 
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  if (!isLoggedIn) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.heartRateTitleWrapper}>
@@ -50,8 +59,8 @@ const App = () => {
             <PulseIndicator />
             <Text style={styles.heartRateTitleText}>Anwser</Text>
             <Text style={styles.heartRateText}>{heartRate} </Text>
-            <TouchableOpacity style={styles.ctaButton} onPress={ () => sendCommandToDevice(connectedDevice,'>QSN<')}>
-              <Text style={styles.ctaButtonText}>{"Send QSN"}</Text>
+            <TouchableOpacity onPress={openModal}>
+              <Text style={styles.ctaButtonText}>{"QSN"}</Text>
             </TouchableOpacity>
           </>
         ) : (
