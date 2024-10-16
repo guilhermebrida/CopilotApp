@@ -1,4 +1,4 @@
-package com.dfriyia2.expoblesample.newarchitecture;
+package com.creare.copilotApp.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -20,9 +20,9 @@ import com.facebook.react.fabric.EmptyReactNativeConfig;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.dfriyia2.expoblesample.BuildConfig;
-import com.dfriyia2.expoblesample.newarchitecture.components.MainComponentsRegistry;
-import com.dfriyia2.expoblesample.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.creare.copilotApp.BuildConfig;
+import com.creare.copilotApp.newarchitecture.components.MainComponentsRegistry;
+import com.creare.copilotApp.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

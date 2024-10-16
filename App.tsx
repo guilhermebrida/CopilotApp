@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import {
   Button,
   SafeAreaView,
@@ -11,6 +11,7 @@ import DeviceModal from "./DeviceConnectionModal";
 import { PulseIndicator } from "./PulseIndicator";
 import useBLE from "./useBLE";
 import LoginScreen from "./login";
+import { setupDatabase, insertUser, getUsers, getUserByCPF} from './db';
 
 const App = () => {
   const {
@@ -21,10 +22,43 @@ const App = () => {
     connectedDevice,
     heartRate,
     disconnectFromDevice,
+    sendCommandToDevice
   } = useBLE();
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [users, setUsers] = useState<String>('');
+  const [retornoSelect, setRetornoSelect] = useState<any[]>([]);
+
+  useEffect(() => {
+    setupDatabase();
+  }, []);
+
+  useEffect(() => {
+    const sendCommandOnConnection = async () => {
+      if (connectedDevice) {
+        try {
+          // Enviando o comando 'QSN'
+          await sendCommandToDevice(connectedDevice, users);
+          console.log('Comando QSN enviado com sucesso');
+        } catch (error) {
+          console.error('Erro ao enviar comando:', error);
+        }
+      }
+    };
+
+    sendCommandOnConnection();
+  }, [connectedDevice]);
+
+  const handleInsertUser = () => {
+    insertUser('John', 'Doe', '12345678900');
+    fetchUsers();
+  };
+
+  // Função para buscar e atualizar os usuários no estado
+  const fetchUsers = () => {
+    getUsers(setRetornoSelect);
+  };
 
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
@@ -43,8 +77,19 @@ const App = () => {
     setIsModalVisible(true);
   };
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  const handleLogin = (userCPF) => {
+    setUsers(userCPF);
+    getUserByCPF(userCPF, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+      }
+      else{
+        console.log(userCPF,users);
+        insertUser('John', 'Doe', userCPF);
+        fetchUsers();
+      }
+    });
+    // setIsLoggedIn(true);
   };
 
   if (!isLoggedIn) {

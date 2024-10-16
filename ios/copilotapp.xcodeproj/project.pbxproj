@@ -319,7 +319,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.dfriyia2.expoblesample";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.creare.copilotApp";
 				PRODUCT_NAME = "copilotapp";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -344,7 +344,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.dfriyia2.expoblesample";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.creare.copilotApp";
 				PRODUCT_NAME = "copilotapp";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

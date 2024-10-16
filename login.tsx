@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, Text, Image } from 'react-native';
 
 interface LoginScreenProps {
-    onLogin: () => void;
+    onLogin: (user:String) => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
@@ -10,7 +10,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
     const handleLogin = () => {
         console.log('CPF:', cpf);
-        onLogin();
+        onLogin(cpf);
     };
 
     return (
@@ -35,19 +35,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             {/* Contêiner para os botões Biometria e Facial lado a lado */}
             <View style={styles.buttonRow}>
                 {/* Botão de Biometria */}
-                <TouchableOpacity style={styles.biometri} onPress={handleLogin}>
+                {/* <TouchableOpacity style={styles.biometri} onPress={handleLogin}>
                     <Image
                         source={require('./assets/biometria.png')}
                         style={styles.imageb}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 {/* Botão Facial */}
-                <TouchableOpacity style={styles.facial} onPress={handleLogin}>
+                {/* <TouchableOpacity style={styles.facial} onPress={handleLogin}>
                     <Image
                         source={require('./assets/facial.png')}
                         style={styles.imagef}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         </View>
     );
