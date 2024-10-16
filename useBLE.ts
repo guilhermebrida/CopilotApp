@@ -178,7 +178,6 @@ function useBLE(): BluetoothLowEnergyApi {
 
   const sendCommandToDevice = async (device: Device, command:string) => {
     try {
-      // Escreve o comando na característica correta
       await device.writeCharacteristicWithResponseForService(
         UUID_SERVICE,
         UUID_CHARACTERISTIC,
@@ -193,8 +192,8 @@ function useBLE(): BluetoothLowEnergyApi {
 
   const startStreamingData = async (device: Device) => {
     if (device) {
-      console.log(device);
-      await sendCommandToDevice(device, ">QVR<");
+      console.log(device.name);
+      await sendCommandToDevice(device, ">QRU00<");
       device.monitorCharacteristicForService(
         UUID_SERVICE,
         UUID_CHARACTERISTIC,

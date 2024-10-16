@@ -34,13 +34,19 @@ const App = () => {
     setupDatabase();
   }, []);
 
+  const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   useEffect(() => {
     const sendCommandOnConnection = async () => {
-      if (connectedDevice) {
+      console.log('sendCommandOnConnection ',heartRate);
+      if (connectedDevice && heartRate) {
         try {
-          // Enviando o comando 'QSN'
-          await sendCommandToDevice(connectedDevice, users);
-          console.log('Comando QSN enviado com sucesso');
+          await sleep(2000);
+          const command = `>RFID:${users}11111<`
+          await sendCommandToDevice(connectedDevice, command);
+          console.log(`Comando ${command} enviado com sucesso`);
         } catch (error) {
           console.error('Erro ao enviar comando:', error);
         }
@@ -48,14 +54,13 @@ const App = () => {
     };
 
     sendCommandOnConnection();
-  }, [connectedDevice]);
+  }, [heartRate]);
 
   const handleInsertUser = () => {
     insertUser('John', 'Doe', '12345678900');
     fetchUsers();
   };
 
-  // Função para buscar e atualizar os usuários no estado
   const fetchUsers = () => {
     getUsers(setRetornoSelect);
   };
@@ -104,9 +109,9 @@ const App = () => {
             <PulseIndicator />
             <Text style={styles.heartRateTitleText}>Anwser</Text>
             <Text style={styles.heartRateText}>{heartRate} </Text>
-            <TouchableOpacity onPress={openModal}>
+            {/* <TouchableOpacity onPress={openModal}>
               <Text style={styles.ctaButtonText}>{"QSN"}</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </>
         ) : (
           <Text style={styles.heartRateTitleText}>
