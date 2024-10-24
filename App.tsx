@@ -6,12 +6,15 @@ import {
   Text,
   TouchableOpacity,
   View,
+  BackHandler,
 } from "react-native";
 import DeviceModal from "./DeviceConnectionModal";
 import { PulseIndicator } from "./PulseIndicator";
 import useBLE from "./useBLE";
 import LoginScreen from "./login";
 import { setupDatabase, insertUser, getUsers, getUserByCPF} from './db';
+import Terminal from "./terminal";
+import FetchAPI from "./api"
 
 const App = () => {
   const {
@@ -20,18 +23,32 @@ const App = () => {
     allDevices,
     connectToDevice,
     connectedDevice,
-    heartRate,
+    copilotAnswer,
     disconnectFromDevice,
-    sendCommandToDevice
+    sendCommandToDevice,
+    receiveData
   } = useBLE();
+
+
+  const {getCredentialToken, token} = FetchAPI()
 
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [users, setUsers] = useState<String>('');
   const [retornoSelect, setRetornoSelect] = useState<any[]>([]);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [token2, setToken] = useState('');
 
   useEffect(() => {
     setupDatabase();
+
+    const fetchToken = async () => {
+      const fetchedToken = await getCredentialToken(); 
+      console.log(`Token obtido: ${fetchedToken}`);
+      
+    };
+    fetchToken();
+
   }, []);
 
   const sleep = (ms) => {
@@ -40,12 +57,13 @@ const App = () => {
 
   useEffect(() => {
     const sendCommandOnConnection = async () => {
-      console.log('sendCommandOnConnection ',heartRate);
-      if (connectedDevice && heartRate) {
+      console.log('sendCommandOnConnection ',copilotAnswer);
+      if (connectedDevice && copilotAnswer) {
         try {
           await sleep(2000);
-          const command = `>RFID:${users}11111<`
+          const command = `>RFID:${users}<`
           await sendCommandToDevice(connectedDevice, command);
+          await receiveData(connectedDevice);
           console.log(`Comando ${command} enviado com sucesso`);
         } catch (error) {
           console.error('Erro ao enviar comando:', error);
@@ -54,7 +72,7 @@ const App = () => {
     };
 
     sendCommandOnConnection();
-  }, [heartRate]);
+  }, [copilotAnswer]);
 
   const handleInsertUser = () => {
     insertUser('John', 'Doe', '12345678900');
@@ -97,9 +115,33 @@ const App = () => {
     // setIsLoggedIn(true);
   };
 
+  const handleTerminal = () => {
+    console.log('handleTerminal');
+    setShowTerminal(true); 
+  };
+
+  // const handleBackPress = () => {
+  //   if (showTerminal) {
+  //     setShowTerminal(false); 
+  //     return true; 
+  //   }
+  //   return false; 
+  // };
+
+  // useEffect(() => {
+  //   const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+  //   return () => backHandler.remove();
+  // }, [showTerminal]);
+
+
+  if (showTerminal) {
+    return <Terminal />;
+  }
+
   if (!isLoggedIn) {
     return <LoginScreen onLogin={handleLogin} />;
   }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -108,7 +150,7 @@ const App = () => {
           <>
             <PulseIndicator />
             <Text style={styles.heartRateTitleText}>Anwser</Text>
-            <Text style={styles.heartRateText}>{heartRate} </Text>
+            <Text style={styles.heartRateText}>{copilotAnswer} </Text>
             {/* <TouchableOpacity onPress={openModal}>
               <Text style={styles.ctaButtonText}>{"QSN"}</Text>
             </TouchableOpacity> */}
@@ -119,6 +161,15 @@ const App = () => {
           </Text>
         )}
       </View>
+      <TouchableOpacity
+          onPress={() => handleTerminal()}
+          style={styles.ctaButton}
+      >
+        <Text style={styles.ctaButtonText}>
+          {"Terminal"}
+        </Text>
+      </TouchableOpacity>
+      
       <TouchableOpacity
         onPress={connectedDevice ? disconnectFromDevice : openModal}
         style={styles.ctaButton}

@@ -23,15 +23,16 @@ interface BluetoothLowEnergyApi {
   disconnectFromDevice: () => void;
   connectedDevice: Device | null;
   allDevices: Device[];
-  heartRate: String;
+  copilotAnswer: String;
   sendCommandToDevice(device:Device, command:String): Promise<void>;
+  receiveData(device:Device):Promise<void>;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
   const bleManager =  useMemo(() => new BleManager(), []);
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
-  const [heartRate, setHeartRate] = useState<String>('');
+  const [copilotAnswer, setCopilotAnswer] = useState<String>('');
 
   const requestAndroid31Permissions = async () => {
     const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -149,16 +150,16 @@ function useBLE(): BluetoothLowEnergyApi {
     if (connectedDevice) {
       bleManager.cancelDeviceConnection(connectedDevice.id);
       setConnectedDevice(null);
-      setHeartRate('');
+      setCopilotAnswer('');
     }
   };
 
-  const onHeartRateUpdate = (
+  const onCopilotAnswerUpdate = (
     error: BleError | null,
     characteristic: Characteristic | null
   ) => {
     if (error) {
-      console.log('onHeartRateUpdate',error);
+      console.log('onCopilotAnswerUpdate',error);
       return -1;
     } else if (!characteristic?.value) {
       console.log("No Data was recieved");
@@ -173,7 +174,7 @@ function useBLE(): BluetoothLowEnergyApi {
     //   sendCommandToDevice(device)
     // }
 
-    setHeartRate(rawData);
+    setCopilotAnswer(rawData);
   };
 
   const sendCommandToDevice = async (device: Device, command:string) => {
@@ -190,6 +191,16 @@ function useBLE(): BluetoothLowEnergyApi {
   };
 
 
+  const receiveData = async (device:Device) =>{
+      console.log(device.name);
+      device.monitorCharacteristicForService(
+        UUID_SERVICE,
+        UUID_CHARACTERISTIC,
+        onCopilotAnswerUpdate
+      );
+  }
+
+
   const startStreamingData = async (device: Device) => {
     if (device) {
       console.log(device.name);
@@ -197,7 +208,7 @@ function useBLE(): BluetoothLowEnergyApi {
       device.monitorCharacteristicForService(
         UUID_SERVICE,
         UUID_CHARACTERISTIC,
-        onHeartRateUpdate
+        onCopilotAnswerUpdate
       );
     } else {
       console.log("No Device Connected");
@@ -211,8 +222,9 @@ function useBLE(): BluetoothLowEnergyApi {
     allDevices,
     connectedDevice,
     disconnectFromDevice,
-    heartRate,
-    sendCommandToDevice
+    copilotAnswer,
+    sendCommandToDevice,
+    receiveData
   };
 }
 
