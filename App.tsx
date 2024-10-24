@@ -1,17 +1,11 @@
-import React, { useState, useEffect  } from "react";
-import {
-  Button,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import DeviceModal from "./DeviceConnectionModal";
 import { PulseIndicator } from "./PulseIndicator";
 import useBLE from "./useBLE";
 import LoginScreen from "./login";
-import { setupDatabase, insertUser, getUsers, getUserByCPF} from './db';
+import { setupDatabase, insertUser, getUsers, getUserByCPF } from './db';
+import SignupScreen from './SignupScreen'; // Tela de cadastro
 
 const App = () => {
   const {
@@ -29,6 +23,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [users, setUsers] = useState<String>('');
   const [retornoSelect, setRetornoSelect] = useState<any[]>([]);
+  const [showSignup, setShowSignup] = useState(false); // Estado para alternar telas
 
   useEffect(() => {
     setupDatabase();
@@ -40,7 +35,6 @@ const App = () => {
 
   useEffect(() => {
     const sendCommandOnConnection = async () => {
-      console.log('sendCommandOnConnection ',heartRate);
       if (connectedDevice && heartRate) {
         try {
           await sleep(2000);
@@ -56,10 +50,24 @@ const App = () => {
     sendCommandOnConnection();
   }, [heartRate]);
 
-  const handleInsertUser = () => {
-    insertUser('John', 'Doe', '12345678900');
-    fetchUsers();
+  const handleLogin = (userCPF) => {
+    setUsers(userCPF);
+    getUserByCPF(userCPF, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+      } else {
+        insertUser('John', 'Doe', userCPF);
+        fetchUsers();
+      }
+    });
   };
+
+  const handleSignup = (userData) => {
+    const { nome, dataNascimento, cpf } = userData;
+    insertUser(nome, dataNascimento, cpf);
+    setShowSignup(false); 
+};
+
 
   const fetchUsers = () => {
     getUsers(setRetornoSelect);
@@ -68,7 +76,6 @@ const App = () => {
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
     if (isPermissionsEnabled) {
-      console.log('iniciando scan');
       scanForPeripherals();
     }
   };
@@ -82,23 +89,12 @@ const App = () => {
     setIsModalVisible(true);
   };
 
-  const handleLogin = (userCPF) => {
-    setUsers(userCPF);
-    getUserByCPF(userCPF, (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-      }
-      else{
-        console.log(userCPF,users);
-        insertUser('John', 'Doe', userCPF);
-        fetchUsers();
-      }
-    });
-    // setIsLoggedIn(true);
-  };
-
+  // Verifica qual tela exibir
   if (!isLoggedIn) {
-    return <LoginScreen onLogin={handleLogin} />;
+    if (showSignup) {
+      return <SignupScreen onSignup={handleSignup} onGoBack={() => setShowSignup(false)} />;
+    }
+    return <LoginScreen onLogin={handleLogin} onSignup={() => setShowSignup(true)} />;
   }
 
   return (
@@ -109,14 +105,9 @@ const App = () => {
             <PulseIndicator />
             <Text style={styles.heartRateTitleText}>Anwser</Text>
             <Text style={styles.heartRateText}>{heartRate} </Text>
-            {/* <TouchableOpacity onPress={openModal}>
-              <Text style={styles.ctaButtonText}>{"QSN"}</Text>
-            </TouchableOpacity> */}
           </>
         ) : (
-          <Text style={styles.heartRateTitleText}>
-            Please Connect to a Copilot
-          </Text>
+          <Text style={styles.heartRateTitleText}>Please Connect to a Copilot</Text>
         )}
       </View>
       <TouchableOpacity

@@ -1,16 +1,39 @@
-import React from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, Text, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, TextInput, TouchableOpacity, Text, Image, Alert } from 'react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
 
 interface LoginScreenProps {
-    onLogin: (user:String) => void;
+    onLogin: (user: string) => void;
+    onSignup: () => void; // Função para navegar para a tela de cadastro
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignup }) => {
     const [cpf, setCpf] = React.useState('');
 
     const handleLogin = () => {
         console.log('CPF:', cpf);
         onLogin(cpf);
+    };
+
+    const authenticateWithBiometrics = async () => {
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+        if (hasHardware && isEnrolled) {
+            const result = await LocalAuthentication.authenticateAsync({
+                promptMessage: 'Authenticate with Biometrics',
+                fallbackLabel: 'Use Password',
+            });
+
+            if (result.success) {
+                console.log('Biometric authentication successful');
+                onLogin(cpf); // Chama a função de login após autenticação bem-sucedida
+            } else {
+                Alert.alert('Authentication failed', 'Please try again.');
+            }
+        } else {
+            Alert.alert('Biometric authentication not available', 'Please enroll your biometrics or use another method.');
+        }
     };
 
     return (
@@ -32,23 +55,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
-            {/* Contêiner para os botões Biometria e Facial lado a lado */}
-            <View style={styles.buttonRow}>
-                {/* Botão de Biometria */}
-                {/* <TouchableOpacity style={styles.biometri} onPress={handleLogin}>
-                    <Image
-                        source={require('./assets/biometria.png')}
-                        style={styles.imageb}
-                    />
-                </TouchableOpacity> */}
-                {/* Botão Facial */}
-                {/* <TouchableOpacity style={styles.facial} onPress={handleLogin}>
-                    <Image
-                        source={require('./assets/facial.png')}
-                        style={styles.imagef}
-                    />
-                </TouchableOpacity> */}
-            </View>
+            
+            {/* Botão de Cadastro */}
+            <TouchableOpacity style={styles.signupButton} onPress={onSignup}>
+                <Text style={styles.buttonText}>Cadastrar-se</Text>
+            </TouchableOpacity>
+
+            {/* Botão de Biometria */}
+            <TouchableOpacity style={styles.biometri} onPress={authenticateWithBiometrics}>
+                <Text style={styles.buttonText}>Login com Biometria</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -80,37 +96,23 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 10,
     },
-    buttonRow: {
-        flexDirection: 'row', // Alinha os botões lado a lado
-        width: '80%', // Largura do contêiner
-        justifyContent: 'center', // Espaçamento entre os botões
+    signupButton: {
+        backgroundColor: '#FF6060',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 50, // Mantenha uma altura fixa
+        width: '80%',
+        borderRadius: 5,
+        marginBottom: 10,
     },
     biometri: {
         backgroundColor: '#FF6060',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '35%',
-        width: '25%',
+        height: 50,
+        width: '80%',
         borderRadius: 5,
-    },
-    facial: {
-        backgroundColor: '#FF6060',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '35%',
-        width: '25%',
-        borderRadius: 5,
-        marginLeft: 10, // Espaçamento entre os botões
-    },
-    imageb: {
-        width: '70%', // Ajuste conforme necessário
-        height: '70%', // Ajuste conforme necessário
-        resizeMode: 'contain', // Mantém a proporção da imagem
-    },
-    imagef: {
-        width: '70%', // Ajuste conforme necessário
-        height: '70%', // Ajuste conforme necessário
-        resizeMode: 'contain', // Mantém a proporção da imagem
+        marginTop: 10,
     },
     buttonText: {
         color: '#fff',

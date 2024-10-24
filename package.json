@@ -22,7 +22,8 @@
     "react-native-base64": "^0.2.1",
     "react-native-ble-plx": "^2.0.3",
     "react-native-sqlite-storage": "^6.0.1",
-    "react-native-web": "~0.18.9"
+    "react-native-web": "~0.18.9",
+    "expo-local-authentication": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
