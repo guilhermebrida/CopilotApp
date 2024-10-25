@@ -1,18 +1,12 @@
-import React, { useState, useEffect  } from "react";
-import {
-  Button,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  BackHandler,
-} from "react-native";
-import DeviceModal from "./DeviceConnectionModal";
-import { PulseIndicator } from "./PulseIndicator";
-import useBLE from "./useBLE";
-import LoginScreen from "./login";
-import { setupDatabase, insertUser, getUsers, getUserByCPF} from './db';
+import React, { useState, useEffect }                             from "react";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import DeviceModal                                                from "./DeviceConnectionModal";
+import { PulseIndicator }                                         from "./PulseIndicator";
+import useBLE                                                     from "./useBLE";
+import LoginScreen                                                from "./login";
+import { setupDatabase, insertUser, getUsers, getUserByCPF }      from './db';
+import SignupScreen                                               from './SignupScreen'; 
+import Icon                                                       from 'react-native-vector-icons/Ionicons'; 
 import Terminal from "./terminal";
 import FetchAPI from "./api"
 
@@ -31,13 +25,14 @@ const App = () => {
 
 
   const {getCredentialToken, token} = FetchAPI()
-
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [users, setUsers] = useState<String>('');
-  const [retornoSelect, setRetornoSelect] = useState<any[]>([]);
-  const [showTerminal, setShowTerminal] = useState(false);
-  const [token2, setToken] = useState('');
+  
+  const [isModalVisible,  setIsModalVisible ] = useState<boolean>(false);
+  const [isLoggedIn,      setIsLoggedIn     ] = useState<boolean>(false);
+  const [users,           setUsers          ] = useState<String>('');
+  const [retornoSelect,   setRetornoSelect  ] = useState<any[]>([]);
+  const [showSignup,      setShowSignup     ] = useState(false); 
+  const [token2,          setToken          ] = useState('');
+  const [showTerminal,    setShowTerminal   ] = useState(false)
 
   useEffect(() => {
     setupDatabase();
@@ -74,9 +69,11 @@ const App = () => {
     sendCommandOnConnection();
   }, [copilotAnswer]);
 
-  const handleInsertUser = () => {
-    insertUser('John', 'Doe', '12345678900');
-    fetchUsers();
+
+  const handleSignup = (userData) => {
+    const { nome, dataNascimento, cpf } = userData;
+    insertUser(nome, dataNascimento, cpf);
+    setShowSignup(false); 
   };
 
   const fetchUsers = () => {
@@ -86,7 +83,6 @@ const App = () => {
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
     if (isPermissionsEnabled) {
-      console.log('iniciando scan');
       scanForPeripherals();
     }
   };
@@ -139,27 +135,35 @@ const App = () => {
   }
 
   if (!isLoggedIn) {
-    return <LoginScreen onLogin={handleLogin} />;
+    if (showSignup) {
+        return <SignupScreen onSignup={handleSignup} onGoBack={() => setShowSignup(false)} />;
+    }
+    return <LoginScreen onLogin={handleLogin} onSignup={() => setShowSignup(true)} />;
   }
 
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.heartRateTitleWrapper}>
+      <TouchableOpacity
+          onPress={() => setIsLoggedIn(false)} 
+          style={styles.backButton}>
+            <Icon 
+              name="arrow-back" 
+              size={30} 
+              color="#fff"/>
+        </TouchableOpacity>
+
+      <View 
+        style={styles.heartRateTitleWrapper}>
         {connectedDevice ? (
           <>
             <PulseIndicator />
             <Text style={styles.heartRateTitleText}>Anwser</Text>
             <Text style={styles.heartRateText}>{copilotAnswer} </Text>
-            {/* <TouchableOpacity onPress={openModal}>
-              <Text style={styles.ctaButtonText}>{"QSN"}</Text>
-            </TouchableOpacity> */}
-          </>
-        ) : (
-          <Text style={styles.heartRateTitleText}>
-            Please Connect to a Copilot
-          </Text>
-        )}
+          </>) : 
+            (
+          <Text style={styles.heartRateTitleText}>Please Connect to a Copilot</Text>
+            )}
       </View>
       <TouchableOpacity
           onPress={() => handleTerminal()}
@@ -169,15 +173,17 @@ const App = () => {
           {"Terminal"}
         </Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity
-        onPress={connectedDevice ? disconnectFromDevice : openModal}
-        style={styles.ctaButton}
-      >
-        <Text style={styles.ctaButtonText}>
-          {connectedDevice ? "Disconnect" : "Connect"}
-        </Text>
-      </TouchableOpacity>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={connectedDevice ? disconnectFromDevice : openModal}
+          style={styles.ctaButton}>
+          <Text style={styles.ctaButtonText}>
+            {connectedDevice ? "Disconnect" : "Connect"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <DeviceModal
         closeModal={hideModal}
         visible={isModalVisible}
@@ -190,38 +196,54 @@ const App = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#f2f2f2",
+    flex            : 1,
+    backgroundColor : "#f2f2f2",
   },
   heartRateTitleWrapper: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    flex            : 1,
+    justifyContent  : "center",
+    alignItems      : "center",
   },
   heartRateTitleText: {
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginHorizontal: 20,
-    color: "black",
+    fontSize          : 30,
+    fontWeight        : "bold",
+    textAlign         : "center",
+    marginHorizontal  : 20,
+    color             : "black",
   },
   heartRateText: {
-    fontSize: 25,
-    marginTop: 15,
+    fontSize  : 25,
+    marginTop : 15,
+  },
+  buttonContainer: {
+    flexDirection   : 'row',
+    justifyContent  : 'space-around',
+    // marginBottom    : 20,
   },
   ctaButton: {
-    backgroundColor: "#FF6060",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 50,
-    marginHorizontal: 20,
-    marginBottom: 5,
-    borderRadius: 8,
+    backgroundColor : "#FF6060",
+    justifyContent  : "center",
+    alignItems      : "center",
+    height          : 50,
+    width           : 140,
+    borderRadius    : 8,
   },
   ctaButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
+    fontSize    : 18,
+    fontWeight  : "bold",
+    color       : "white",
+  },
+  backButton: {
+    position        : 'absolute',
+    top             : 40,
+    left            : 20,
+    zIndex          : 1,
+    backgroundColor : '#FF6060',
+    justifyContent  : 'center',
+    alignItems      : 'center',
+    width           : 40,
+    height          : 40,
+    borderRadius    : 25, 
   },
 });
 
