@@ -24,7 +24,7 @@ const App = () => {
   } = useBLE();
 
 
-  const {getCredentialToken, token} = FetchAPI()
+  const {getCredentialToken, getFrotaVehicles, token} = FetchAPI()
   
   const [isModalVisible,  setIsModalVisible ] = useState<boolean>(false);
   const [isLoggedIn,      setIsLoggedIn     ] = useState<boolean>(false);
@@ -40,9 +40,15 @@ const App = () => {
     const fetchToken = async () => {
       const fetchedToken = await getCredentialToken(); 
       console.log(`Token obtido: ${fetchedToken}`);
-      
+      fetchVehicles();
     };
+    const fetchVehicles = async () =>{
+      const fetchedVehicles = await getFrotaVehicles();
+      console.log(`fetchedVehicles: ${fetchedVehicles}`);
+    }
     fetchToken();
+    
+
 
   }, []);
 
@@ -165,14 +171,14 @@ const App = () => {
           <Text style={styles.heartRateTitleText}>Please Connect to a Copilot</Text>
             )}
       </View>
-      <TouchableOpacity
+      {/* <TouchableOpacity
           onPress={() => handleTerminal()}
           style={styles.ctaButton}
       >
         <Text style={styles.ctaButtonText}>
           {"Terminal"}
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity

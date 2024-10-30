@@ -4,18 +4,19 @@ const Buffer = require("buffer").Buffer;
 
 
 const FetchAPI = () => {
-    const URL_API_FROTA = 'https://openid-provider.crearecloud.com.br/auth/v1/token?lang=pt-BR'
-    const API_CLIENT_ID = '53309'
-    const API_CLIENT_SECRET = '7lh3G~qj~4-H'
+    const URL_API_TOKEN     = 'https://openid-provider.crearecloud.com.br/auth/v1/token?lang=pt-BR'
+    const URL_API_FROTA     = 'https://api.crearecloud.com.br/frotalog/basic-services/v3'
+    const API_CLIENT_ID     = ''
+    const API_CLIENT_SECRET = ''
 
 
-    const [token, setToken] = useState('')
+    const [token,         setToken        ] = useState('')
     const [vehiclePlates, setVehiclePlates] = useState([]);
 
     const getCredentialToken = async () => {
       console.log('getCredentialToken');
       try {
-        const response = await fetch(URL_API_FROTA,{
+        const response = await fetch(URL_API_TOKEN,{
             method: 'POST',
             headers: {
                 'Authorization': 'Basic ' + Buffer.from(`${API_CLIENT_ID}:${API_CLIENT_SECRET}`).toString('base64'), 
@@ -26,6 +27,11 @@ const FetchAPI = () => {
               }),
             }
         );
+
+        if (!response.ok) {
+          console.error(`HTTP error! Status: ${response.status}`);
+          return;
+        }
 
         const result = await response.json();
         console.log(result);
@@ -38,26 +44,39 @@ const FetchAPI = () => {
       } 
     };
 
-    // const getFrotaVehicles = async () => {
-    //   console.log('getFrotaVehicles');
-    //   try{
-    //     const response = await fetch(`${URL_API_FROTA}/vehicles`),{
-    //       methods: 'GET',
+    const getFrotaVehicles = async () => {
+      console.log('getFrotaVehicles');
+      try{
+        // const response = await fetch(`${URL_API_FROTA}/vehicles?recursive=true&customerId=1`,{
+        const response = await fetch('https://api.crearecloud.com.br/frotalog/basic-services/v3/vehicles/578419',{
+        // const response = await fetch('https://api.crearecloud.com.br/frotalog/basic-services/v3/vehicles?recursive=true&customerId=1',{
+        // const response = await fetch('https://api.crearecloud.com.br/frotalog/basic-services/v3/drivers',{
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+        });
 
+        // if (!response.ok) {
+        //   console.error(`HTTP error! Status: ${response.status}`);
+        //   return;
+        // }
+        
+  
+        const result = await response.json();
+        console.log(JSON.stringify(result, null, 2));
+      }
+      catch (error) {
+        console.error(error);
+      } 
 
-    //     }
-
-    //   }
-    //   catch{
-
-    //   }
-
-    // }
+    }
 
 
 
     return {
       getCredentialToken,
+      getFrotaVehicles,
       token
     }
 
