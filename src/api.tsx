@@ -6,8 +6,8 @@ const Buffer = require("buffer").Buffer;
 const FetchAPI = () => {
     const URL_API_TOKEN     = 'https://openid-provider.crearecloud.com.br/auth/v1/token?lang=pt-BR'
     const URL_API_FROTA     = 'https://api.crearecloud.com.br/frotalog/basic-services/v3'
-    const API_CLIENT_ID     = ''
-    const API_CLIENT_SECRET = ''
+    const API_CLIENT_ID     = '39347'
+    const API_CLIENT_SECRET = 'R@39347'
 
 
     const [token,         setToken        ] = useState('')
