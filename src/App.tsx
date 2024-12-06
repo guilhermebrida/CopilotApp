@@ -7,7 +7,7 @@ import LoginScreen                                                from "./screen
 import { setupDatabase, insertUser, getUsers, getUserByCPF }      from './services/db';
 import SignupScreen                                               from './screens/SignupScreen'; 
 import Icon                                                       from 'react-native-vector-icons/Ionicons'; 
-import Terminal from "./screens/terminal";
+import Terminal from "./screens/Terminal";
 import FetchAPI from "./services/api"
 
 const App = () => {

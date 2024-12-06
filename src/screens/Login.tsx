@@ -52,7 +52,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSignup }) => {
     return (
         <View style={styles.container}>
             <Image
-                source      = {require('./assets/logoCreare.png')}
+                source      = {require('../assets/logoCreare.png')}
                 style       = {styles.image}
                 resizeMode  = "contain"
             />

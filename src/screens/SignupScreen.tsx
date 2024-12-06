@@ -38,7 +38,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({onGoBack }) => {
             </TouchableOpacity>
 
             <Image
-                source={require('./assets/logoCreare.png')}
+                source={require('../assets/logoCreare.png')}
                 style={styles.image}
                 resizeMode="contain"
             />

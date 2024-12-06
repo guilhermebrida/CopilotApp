@@ -23,6 +23,7 @@
     "react-native": "0.70.8",
     "react-native-base64": "^0.2.1",
     "react-native-ble-plx": "^2.0.3",
+    "react-native-bluetooth-classic": "^1.60.0-rc.30",
     "react-native-sqlite-storage": "^6.0.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.18.9"

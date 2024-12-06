@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import { useMemo, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
-// import BluetoothClassic from 'react-native-bluetooth-classic';
+import BluetoothClassic from 'react-native-bluetooth-classic';
 import {
   BleError,
   BleManager,
@@ -93,10 +93,24 @@ function useBLE(): BluetoothLowEnergyApi {
   const isDuplicteDevice = (devices: Device[], nextDevice: Device) =>
     devices.findIndex((device) => nextDevice.id === device.id) > -1;
 
-  const scanForPeripherals = () => {
+  const scanForPeripherals = async () => {
     console.log('Iniciando escaneamento de dispositivos...');
-    // const devices = BluetoothClassic.list();
-    // console.log(devices);
+    const discoveredDevices = await BluetoothClassic.startDiscovery();
+    console.log('Dispositivos encontrados:', discoveredDevices); // Mostra todos os dispositivos no console
+
+    discoveredDevices.forEach((device: any) => {
+      // Verifica se o nome do dispositivo contém "VIRTEC"
+      if (device.name?.includes("VIRTEC")) {
+        console.log('Dispositivo encontrado:', device.name);
+        setAllDevices((prevState: Device[]) => {
+          if (!isDuplicteDevice(prevState, device)) {
+            return [...prevState, device];
+          }
+          return prevState;
+        });
+      }
+    });
+
     bleManager.startDeviceScan(null, null, (error, device) => {
 
       if (error) {
