@@ -1,14 +1,14 @@
 import React, { useState, useEffect }                             from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import DeviceModal                                                from "./src/DeviceConnectionModal";
-import { PulseIndicator }                                         from "./src/PulseIndicator";
-import useBLE                                                     from "./src/useBLE";
-import LoginScreen                                                from "./src/login";
-import { setupDatabase, insertUser, getUsers, getUserByCPF }      from './src/db';
-import SignupScreen                                               from './src/SignupScreen'; 
+import DeviceModal                                                from "./components/DeviceConnectionModal";
+import { PulseIndicator }                                         from "./components/PulseIndicator";
+import useBLE                                                     from "./services/useBLE";
+import LoginScreen                                                from "./screens/Login";
+import { setupDatabase, insertUser, getUsers, getUserByCPF }      from './services/db';
+import SignupScreen                                               from './screens/SignupScreen'; 
 import Icon                                                       from 'react-native-vector-icons/Ionicons'; 
-import Terminal from "./src/terminal";
-import FetchAPI from "./src/api"
+import Terminal from "./screens/terminal";
+import FetchAPI from "./services/api"
 
 const App = () => {
   const {
