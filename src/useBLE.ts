@@ -26,6 +26,7 @@ interface BluetoothLowEnergyApi {
   copilotAnswer: String;
   sendCommandToDevice(device:Device, command:String): Promise<void>;
   receiveData(device:Device):Promise<void>;
+  startStreamingData(device: Device): void;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
@@ -139,7 +140,8 @@ function useBLE(): BluetoothLowEnergyApi {
       }
   
       bleManager.stopDeviceScan();
-      startStreamingData(deviceConnection);
+      // startStreamingData(deviceConnection);
+      // receiveData(deviceConnection);
   
     } catch (e) {
       console.log("Falha ao conectar ou descobrir características:", e);
@@ -159,22 +161,21 @@ function useBLE(): BluetoothLowEnergyApi {
     characteristic: Characteristic | null
   ) => {
     if (error) {
-      console.log('onCopilotAnswerUpdate',error);
-      return -1;
-    } else if (!characteristic?.value) {
-      console.log("No Data was recieved");
-      return -1;
+      console.log('Erro no monitoramento:', error);
+      return;
     }
-    console.log('recebendo dados')
-
+  
+    if (!characteristic?.value) {
+      console.log('Nenhum dado recebido.');
+      return;
+    }
+  
     const rawData = base64.decode(characteristic.value);
-    console.log(rawData);
-
-    // if (rawData.includes('RVR')){
-    //   sendCommandToDevice(device)
-    // }
-
-    setCopilotAnswer(rawData);
+  
+    if (rawData !== copilotAnswer) { // Evita logs repetidos
+      console.log('Dados recebidos:', rawData);
+      setCopilotAnswer(rawData);
+    }
   };
 
   const sendCommandToDevice = async (device: Device, command:string) => {
@@ -192,6 +193,7 @@ function useBLE(): BluetoothLowEnergyApi {
 
 
   const receiveData = async (device:Device) =>{
+      console.log("receiveData");
       console.log(device.name);
       device.monitorCharacteristicForService(
         UUID_SERVICE,
@@ -204,7 +206,7 @@ function useBLE(): BluetoothLowEnergyApi {
   const startStreamingData = async (device: Device) => {
     if (device) {
       console.log(device.name);
-      await sendCommandToDevice(device, ">QRU00<");
+      // await sendCommandToDevice(device, ">QRU01,37,12<");
       device.monitorCharacteristicForService(
         UUID_SERVICE,
         UUID_CHARACTERISTIC,
@@ -224,7 +226,8 @@ function useBLE(): BluetoothLowEnergyApi {
     disconnectFromDevice,
     copilotAnswer,
     sendCommandToDevice,
-    receiveData
+    receiveData,
+    startStreamingData
   };
 }
 

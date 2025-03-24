@@ -58,6 +58,7 @@ const DeviceModal: FC<DeviceModalProps> = (props) => {
   );
 
   return (
+    
     <Modal
       style={modalStyle.modalContainer}
       animationType="slide"

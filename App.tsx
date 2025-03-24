@@ -20,7 +20,8 @@ const App = () => {
     copilotAnswer,
     disconnectFromDevice,
     sendCommandToDevice,
-    receiveData
+    receiveData,
+    startStreamingData
   } = useBLE();
 
 
@@ -64,8 +65,9 @@ const App = () => {
           await sleep(2000);
           const command = `>RFID:${users}<`
           await sendCommandToDevice(connectedDevice, command);
-          await receiveData(connectedDevice);
           console.log(`Comando ${command} enviado com sucesso`);
+          await receiveData(connectedDevice);
+          await startStreamingData(connectedDevice);
         } catch (error) {
           console.error('Erro ao enviar comando:', error);
         }
@@ -166,6 +168,9 @@ const App = () => {
             <PulseIndicator />
             <Text style={styles.heartRateTitleText}>Anwser</Text>
             <Text style={styles.heartRateText}>{copilotAnswer} </Text>
+            {/* <Text style={[styles.heartRateText, { flexWrap: 'wrap', overflow: 'visible' }]}> */}
+              {/* {copilotAnswer} */}
+            {/* </Text> */}
           </>) : 
             (
           <Text style={styles.heartRateTitleText}>Please Connect to a Copilot</Text>
